@@ -65,7 +65,7 @@
                         jcr:title="Fall Back Settings"
                         sling:resourceType="granite/ui/components/foundation/container">
                         <items jcr:primaryType="nt:unstructured">
-                            <usersubmenu
+                            <tab
                                 jcr:primaryType="nt:unstructured"
                                 jcr:title="Fall Back"
                                 sling:resourceType="granite/ui/components/foundation/section">
@@ -77,7 +77,7 @@
                                         jcr:primaryType="nt:unstructured"
                                         sling:resourceType="granite/ui/components/foundation/container">
                                         <items jcr:primaryType="nt:unstructured">
-                                            <usersubmenudetails
+                                            <configuration
                                                 jcr:primaryType="nt:unstructured"
                                                 sling:resourceType="granite/ui/components/foundation/form/multifield"
                                                 class="full-width"
@@ -114,16 +114,17 @@
                                                                     sling:resourceType="granite/ui/components/foundation/form/datepicker"
                                                                     fieldDescription="Enter Publish Date"
                                                                     fieldLabel="Publish Date"
-                                                                    name="./pubDate"/>
+                                                                    name="./pubDate"
+                                                                    type="datetime"/>
                                                             </items>
                                                         </column>
                                                     </items>
                                                 </field>
-                                            </usersubmenudetails>
+                                            </configuration>
                                         </items>
                                     </tab>
                                 </items>
-                            </usersubmenu>
+                            </tab>
                         </items>
                     </tabs>
                 </items>

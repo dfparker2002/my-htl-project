@@ -41,7 +41,7 @@ public class FeedServlet extends SlingSafeMethodsServlet {
         String pagePath= slingRequest.getParameter("pagePath");
         String jsonString;
         String[] fallBackValues=multiFieldValues(slingRequest,pagePath);
-        int responseCode=200;
+        int responseCode=HttpStatus.SC_OK;
         try {
             DefaultHttpClient httpClient = new DefaultHttpClient();
            LOG.debug("Before http call");
@@ -68,8 +68,9 @@ public class FeedServlet extends SlingSafeMethodsServlet {
             slingResponse.getWriter().write(jsonString);
 
             LOG.debug("xml to json : " + jsonString);
+            System.out.println("jsonString :"+jsonString);
         } catch (Exception e) {
-            e.printStackTrace();
+
             LOG.error("error in feed : " + e.getMessage());
             }
         finally {
@@ -77,12 +78,13 @@ public class FeedServlet extends SlingSafeMethodsServlet {
                 jsonString = createJSON(fallBackValues).toString();
                 slingResponse.getWriter().write(jsonString);
                 LOG.debug("Manual json : " + jsonString);
+                System.out.println("Manual json : " + jsonString);
             }
         }
     }
 
     private String getJSON(String xmldata) {
-        JSONObject xmlJSONObj = new JSONObject();
+        JSONObject xmlJSONObj;
         String jsonPrettyPrintString= null;
         try {
            xmlJSONObj =XML.toJSONObject(xmldata);
@@ -117,6 +119,7 @@ public class FeedServlet extends SlingSafeMethodsServlet {
         }catch (Exception e){
             LOG.error("Error creating json from multifield :"+e.getMessage());
         }
+        System.out.println("mainObject"+mainObject);
         return mainObject;
     }
 }

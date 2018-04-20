@@ -10,7 +10,7 @@ function feedImporter() {
 		console.log(feedURL);
 		console.log(feedListSize);
 		console.log(pagePath);
-        if(feedURL && feedListSize) {
+
 		$.ajax({
                 url: "/bin/feeds",
     			data : {feedURL,feedListSize,pagePath},
@@ -25,10 +25,10 @@ function feedImporter() {
                 },
                 complete: function() {
       // Schedule the next request when the current one's complete
-     		 //setTimeout(feedImporter, 5000);
+     		 setTimeout(feedImporter, 5000);
    				}
 			});
-        }
+
 }
 function updateFeeds(result,size){
 $("#feed-data").empty();
