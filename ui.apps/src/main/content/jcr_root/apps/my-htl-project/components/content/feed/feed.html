@@ -1,0 +1,22 @@
+<div data-sly-test="${wcmmode.edit || wcmmode.design}">Please author Feed component</div>
+<input type="hidden" name="pagePath" id="pagePath" value="${resource.getPath}">
+
+<div id="feed-url" style="display:none">
+    ${properties.url}
+</div>
+<div id="feed-list-size" style="display:none">
+    ${properties.listsize}
+</div>
+
+<sly data-sly-test="${wcmmode.disabled}">
+    <div class="container" style="border:2px grey">
+        <div class="row">
+
+            <div class="col-lg-12">
+                <div class="feed-content" id ="feed-data"></div>
+            </div>
+        </div>
+    </div>
+</sly>
+
+
