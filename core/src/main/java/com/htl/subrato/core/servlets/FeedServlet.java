@@ -14,6 +14,7 @@ import org.apache.sling.api.resource.Resource;
 import org.apache.sling.api.resource.ResourceResolver;
 import org.apache.sling.api.resource.ValueMap;
 import org.apache.sling.api.servlets.SlingSafeMethodsServlet;
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.XML;
 import org.slf4j.Logger;
@@ -96,11 +97,10 @@ public class FeedServlet extends SlingSafeMethodsServlet {
         String jsonPrettyPrintString= null;
         try {
            xmlJSONObj =XML.toJSONObject(xmldata);
-           jsonPrettyPrintString = xmlJSONObj.toString(4);
-           System.out.println(jsonPrettyPrintString);
-        } catch (Exception e) {
+           jsonPrettyPrintString = xmlJSONObj.toString();
+            } catch (JSONException e) {
             LOG.error("error in parsing XML:"+e.getMessage());
-        }
+            }
         return jsonPrettyPrintString;
     }
     private String[] multiFieldValues (SlingHttpServletRequest slingRequest, String resourcePath){
