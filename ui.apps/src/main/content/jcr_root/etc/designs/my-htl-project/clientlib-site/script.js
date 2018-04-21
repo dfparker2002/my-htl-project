@@ -7,21 +7,15 @@ function feedImporter() {
     var feedURL = document.getElementById('feed-url').innerHTML;
     var feedListSize = document.getElementById('feed-list-size').innerHTML;
     var pagePath = document.getElementById('pagePath').value;
-		console.log(feedURL);
-		console.log(feedListSize);
-		console.log(pagePath);
 
 		$.ajax({
                 url: "/bin/feeds",
     			data : {feedURL,feedListSize,pagePath},
                 success: function(result) {
-               console.log("result");
-                    console.log(result);
-                console.log(JSON.parse(result));
-                 updateFeeds(JSON.parse(result),feedListSize);
+                updateFeeds(result,feedListSize);
                 },
                 error: function(xhr, status, error) {
-
+				console.error("Ajax Call not Success Full");
                 },
                 complete: function() {
       // Schedule the next request when the current one's complete
@@ -31,6 +25,7 @@ function feedImporter() {
 
 }
 function updateFeeds(result,size){
+
 $("#feed-data").empty();
  if(size<=result.rss.channel.item.length) {
   for (i = 0; i < size; i++) { 

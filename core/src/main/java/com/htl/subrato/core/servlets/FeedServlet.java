@@ -18,7 +18,6 @@ import org.json.JSONObject;
 import org.json.XML;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import javax.servlet.ServletException;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -31,16 +30,23 @@ import java.util.Arrays;
 @SlingServlet(paths="/bin/feeds",methods = "GET")
 public class FeedServlet extends SlingSafeMethodsServlet {
     private static final Logger LOG = LoggerFactory.getLogger(FeedServlet.class);
+    private static final String FEED_URL ="feedURL";
+    private static final String RESOURCE_OBJECT ="pagePath";
+    private static final String MULTIFIELD_FIELD="fallback";
+    private static final String RSS="rss";
+    private static final String ITEM="item";
+    private static final String CHANNEL="channel";
+
 
 
     @Override
     protected void doGet(final SlingHttpServletRequest slingRequest,
                          final SlingHttpServletResponse slingResponse) throws ServletException, IOException {
         LOG.debug("inside do method of Feed servlet");
-        String feedURL = slingRequest.getParameter("feedURL");
-        String pagePath= slingRequest.getParameter("pagePath");
+        String feedURL = slingRequest.getParameter(FEED_URL);
+        String resourceObject= slingRequest.getParameter(RESOURCE_OBJECT);
         String jsonString;
-        String[] fallBackValues=multiFieldValues(slingRequest,pagePath);
+        String[] fallBackValues=multiFieldValues(slingRequest,resourceObject);
         int responseCode=HttpStatus.SC_OK;
         try {
             DefaultHttpClient httpClient = new DefaultHttpClient();
@@ -65,10 +71,12 @@ public class FeedServlet extends SlingSafeMethodsServlet {
             httpClient.getConnectionManager().shutdown();
             LOG.debug(" Feed response XML version: {}", myXML);
             jsonString  = getJSON(myXML);
+            slingResponse.setContentType("application/json");
+            slingResponse.setCharacterEncoding("utf-8");
             slingResponse.getWriter().write(jsonString);
 
             LOG.debug("xml to json : " + jsonString);
-            System.out.println("jsonString :"+jsonString);
+
         } catch (Exception e) {
 
             LOG.error("error in feed : " + e.getMessage());
@@ -78,7 +86,7 @@ public class FeedServlet extends SlingSafeMethodsServlet {
                 jsonString = createJSON(fallBackValues).toString();
                 slingResponse.getWriter().write(jsonString);
                 LOG.debug("Manual json : " + jsonString);
-                System.out.println("Manual json : " + jsonString);
+
             }
         }
     }
@@ -100,7 +108,7 @@ public class FeedServlet extends SlingSafeMethodsServlet {
         Resource resource = resourceResolver.getResource(resourcePath);
         ValueMap valueMap= resource.getValueMap();
 
-        String[] multifiled=valueMap.get("fallback",String[].class);
+        String[] multifiled=valueMap.get(MULTIFIELD_FIELD,String[].class);
         LOG.debug("multifield values:>"+Arrays.toString(multifiled));
        return  multifiled;
     }
@@ -113,13 +121,12 @@ public class FeedServlet extends SlingSafeMethodsServlet {
         try {
             String jsonArrayString = Arrays.toString(multifield);
             JsonArray arrayFromString =jsonParser.parse(jsonArrayString).getAsJsonArray();
-            channel.add("item",arrayFromString);
-            rss.add("channel",channel);
-            mainObject.add("rss",rss);
+            channel.add(ITEM,arrayFromString);
+            rss.add(CHANNEL,channel);
+            mainObject.add(RSS,rss);
         }catch (Exception e){
             LOG.error("Error creating json from multifield :"+e.getMessage());
         }
-        System.out.println("mainObject"+mainObject);
         return mainObject;
     }
 }
