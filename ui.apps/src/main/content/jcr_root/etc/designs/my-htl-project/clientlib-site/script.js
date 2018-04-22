@@ -19,7 +19,7 @@ function feedImporter() {
                 },
                 complete: function() {
       // Schedule the next request when the current one's complete
-     		 setTimeout(feedImporter, 5000);
+     		 setTimeout(feedImporter, 100000);
    				}
 			});
 
