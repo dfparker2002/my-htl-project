@@ -31,7 +31,6 @@ public class FeedServlet extends SlingSafeMethodsServlet {
         try {
             String jsonString;
             responseOutput = feedService.getResponse(feedURL);
-
             LOG.debug(" Feed response XML version: {}", responseOutput);
             jsonString = feedService.getJSON(responseOutput);
             slingResponse.setContentType("application/json");
