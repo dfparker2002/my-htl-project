@@ -14,7 +14,6 @@ import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.sling.api.resource.Resource;
-import org.apache.sling.api.resource.ResourceNotFoundException;
 import org.apache.sling.api.resource.ResourceResolver;
 import org.apache.sling.api.resource.ValueMap;
 import org.json.JSONException;
@@ -28,8 +27,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Arrays;
 
+
 @Component(
-        immediate = true,
         label = "Feed Service",
         description = "Feed Service provider")
 @Service(value = FeedService.class)
@@ -49,41 +48,39 @@ public class FeedServiceImpl implements FeedService {
     }
 
     @Override
-    public String[] multiFieldValues(ResourceResolver resourceResolver, String resourcePath) {
+    public String  multiFieldValues(ResourceResolver resourceResolver, String resourcePath) {
         Resource resource = resourceResolver.getResource(resourcePath);
-        if (null == resource) {
-            throw new ResourceNotFoundException("Resource Not Found!");
+        String multiFieldToString = StringUtils.EMPTY;
+        if (null != resource) {
+            ValueMap valueMap = resource.getValueMap();
+            String[] multiField = valueMap.get(RssFeedConstants.MULTI_FIELD, String[].class);
+            multiFieldToString = Arrays.toString(multiField);
+            LOG.debug("MultiField values:  " + multiFieldToString);
         }
-        ValueMap valueMap = resource.getValueMap();
-        final String[] multiField = valueMap.get(RssFeedConstants.MULTIFIELD_FIELD, String[].class);
-        LOG.debug("Multifield values:  " + Arrays.toString(multiField));
-        return multiField;
+        return multiFieldToString;
     }
 
     @Override
-    public JsonObject createJsonObject(String[] multiFieldValues) {
+    public JsonObject createJsonObject(String multiFieldValues) {
         JsonObject jsonObject = new JsonObject();
         JsonObject rss = new JsonObject();
         JsonObject channel = new JsonObject();
         JsonParser jsonParser = new JsonParser();
         try {
-            String jsonArrayString = Arrays.toString(multiFieldValues);
-            JsonArray arrayFromString = jsonParser.parse(jsonArrayString).getAsJsonArray();
+            JsonArray arrayFromString = jsonParser.parse(multiFieldValues).getAsJsonArray();
             channel.add(RssFeedConstants.ITEM, arrayFromString);
             rss.add(RssFeedConstants.CHANNEL, channel);
             jsonObject.add(RssFeedConstants.RSS, rss);
             return jsonObject;
         } catch (JsonSyntaxException e) {
-            LOG.error("Error creating json from multiFieldValues :" + e);
+            LOG.error("Error creating json from multiFieldValues : {}", e);
         }
         return jsonObject;
-
-
     }
 
     @Override
     public String getResponse(String url) {
-        String responseString = StringUtils.EMPTY;
+        StringBuilder responseString = new StringBuilder();
         try {
             int responseCode;
             DefaultHttpClient httpClient = new DefaultHttpClient();
@@ -92,24 +89,22 @@ public class FeedServiceImpl implements FeedService {
             HttpResponse response = httpClient.execute(getRequest);
             LOG.debug(" Response from http call : {}", response);
             responseCode = response.getStatusLine().getStatusCode();
-            if (responseCode != HttpStatus.SC_OK) {
-                throw new RuntimeException("Failed : HTTP error code : "
-                        + response.getStatusLine().getStatusCode());
+            if (responseCode == HttpStatus.SC_OK) {
+                BufferedReader br = new BufferedReader(new InputStreamReader((response.getEntity().getContent())));
+                String output;
+                while ((output = br.readLine()) != null) {
+                    responseString = responseString.append(output);
+                }
+                httpClient.getConnectionManager().shutdown();
+                return responseString.toString();
+            } else {
+                LOG.error(" Http Status code :" + responseCode);
             }
-            BufferedReader br = new BufferedReader(new InputStreamReader((response.getEntity().getContent())));
-            String output;
-            while ((output = br.readLine()) != null) {
-                responseString = responseString + output;
-            }
-            httpClient.getConnectionManager().shutdown();
-            return responseString;
         } catch (ClientProtocolException e) {
             LOG.error("Error in connection : {}", e);
         } catch (IOException e) {
             LOG.error("Input Out put operation failed : {}", e);
-        } catch (RuntimeException e) {
-            LOG.error("RunTime Connection Exception : {}", e);
         }
-        return responseString;
+        return responseString.toString();
     }
 }

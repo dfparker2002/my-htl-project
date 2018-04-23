@@ -14,13 +14,13 @@ public interface FeedService {
     String getJSON(String xmlFormatString);
 
     /**
-     * Create String[] from MultiField dialog values
+     * Create String from MultiField dialog values
      *
-     * @param resourceResolver - ResourceResolver object from slingrequest
+     * @param resourceResolver - ResourceResolver object from slingRequest
      * @param resourcePath     - path where component is used
      * @return multiField in String[] format
      */
-    String[] multiFieldValues(ResourceResolver resourceResolver, String resourcePath);
+    String multiFieldValues(ResourceResolver resourceResolver, String resourcePath);
 
     /**
      * This method creates a JSONObject tree from a Multifield ValueMap.
@@ -28,7 +28,7 @@ public interface FeedService {
      * @param multiFieldValues - multiFieldValues from component dialog as String array
      * @return JSONObject according to RSS structure
      */
-    JsonObject createJsonObject(String[] multiFieldValues);
+    JsonObject createJsonObject(String multiFieldValues);
 
     /**
      * Returns String representation of http response

@@ -18,7 +18,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 import java.util.Arrays;
 
-import static com.htl.subrato.core.servlets.RssFeedConstants.MULTIFIELD_FIELD;
+import static com.htl.subrato.core.servlets.RssFeedConstants.MULTI_FIELD;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.anyString;
@@ -72,10 +72,10 @@ public class FeedServiceTest {
         String[] strArr = new String[10];
         strArr[0] = "{\"mfg\":\"dasdas\",\"description\":\"sadasd\",\"pubDate\":\"2018-04-18T14:28:00.000+02:00\"}";
         strArr[1] = "{\"title\":\"sdasd\",\"description\":\"asdasd\",\"pubDate\":\"2018-04-18T11:28:00.000+02:00\"}";
-        when(valueMap.get(MULTIFIELD_FIELD, String[].class)).thenReturn(strArr);
-        String[] multiFieldValues = feedServiceImpl.multiFieldValues(resourceResolver, resource.getPath());
+        when(valueMap.get(MULTI_FIELD, String[].class)).thenReturn(strArr);
+        String multiFieldValues = feedServiceImpl.multiFieldValues(resourceResolver, resource.getPath());
 
-        assertArrayEquals(strArr, multiFieldValues);
+        assertEquals(Arrays.toString(strArr), multiFieldValues);
     }
 
     @Test
@@ -93,8 +93,7 @@ public class FeedServiceTest {
         channel.add(RssFeedConstants.ITEM, arrayFromString);
         rss.add(RssFeedConstants.CHANNEL, channel);
         jsonObject.add(RssFeedConstants.RSS, rss);
-
-        JsonObject jsonResult = feedServiceImpl.createJsonObject(strArr);
+        JsonObject jsonResult = feedServiceImpl.createJsonObject(Arrays.toString(strArr));
         assertEquals(jsonObject, jsonResult);
 
     }
