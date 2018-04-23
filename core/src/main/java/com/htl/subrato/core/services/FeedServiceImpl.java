@@ -55,7 +55,7 @@ public class FeedServiceImpl implements FeedService {
         }
         ValueMap valueMap = resource.getValueMap();
         final String[] multiField = valueMap.get(RssFeedConstants.MULTIFIELD_FIELD, String[].class);
-        LOG.debug("Multifield values:> " + Arrays.toString(multiField));
+        LOG.debug("Multifield values:  " + Arrays.toString(multiField));
         return multiField;
     }
 
@@ -74,15 +74,15 @@ public class FeedServiceImpl implements FeedService {
             return jsonObject;
         } catch (JsonSyntaxException e) {
             LOG.error("Error creating json from multiFieldValues :" + e);
-            jsonObject.addProperty("Error", "Error in json syntax");
-            return jsonObject;
         }
+        return jsonObject;
+
 
     }
 
     @Override
     public String getResponse(String url) {
-        StringBuffer responseString = new StringBuffer();
+        String responseString = null;
         try {
             int responseCode;
             DefaultHttpClient httpClient = new DefaultHttpClient();
@@ -98,7 +98,7 @@ public class FeedServiceImpl implements FeedService {
             BufferedReader br = new BufferedReader(new InputStreamReader((response.getEntity().getContent())));
             String output;
             while ((output = br.readLine()) != null) {
-                responseString = responseString.append(output);
+                responseString = responseString + output;
             }
             httpClient.getConnectionManager().shutdown();
             return responseString.toString();
@@ -106,7 +106,9 @@ public class FeedServiceImpl implements FeedService {
             LOG.error("Error in connection : {}", e);
         } catch (IOException e) {
             LOG.error("Input Out put operation failed : {}", e);
+        } catch (RuntimeException e) {
+            LOG.error("RunTime Connection Exception : {}", e);
         }
-        return responseString.toString();
+        return responseString;
     }
 }

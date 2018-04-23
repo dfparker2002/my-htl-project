@@ -1,11 +1,10 @@
 package com.htl.subrato.core.servlets;
 
+import com.google.gson.JsonObject;
 import com.htl.subrato.core.services.FeedService;
-import com.htl.subrato.core.services.FeedServiceImpl;
 import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.sling.SlingServlet;
 import org.apache.http.HttpStatus;
-import org.apache.http.client.HttpResponseException;
 import org.apache.sling.api.SlingHttpServletRequest;
 import org.apache.sling.api.SlingHttpServletResponse;
 import org.apache.sling.api.servlets.SlingSafeMethodsServlet;
@@ -32,6 +31,7 @@ public class FeedServlet extends SlingSafeMethodsServlet {
         try {
             String jsonString;
             responseOutput = feedService.getResponse(feedURL);
+
             LOG.debug(" Feed response XML version: {}", responseOutput);
             jsonString = feedService.getJSON(responseOutput);
             slingResponse.setContentType("application/json");
@@ -39,21 +39,27 @@ public class FeedServlet extends SlingSafeMethodsServlet {
             slingResponse.setStatus(HttpStatus.SC_OK);
             slingResponse.getWriter().write(jsonString);
             LOG.debug("xml to json : " + jsonString);
-        } catch (HttpResponseException e) {
+        } catch (Exception e) {
             LOG.error("error in feed : " + e);
         } finally {
             if (null == responseOutput) {
+
                 fallBack(slingRequest, slingResponse);
             }
+
         }
     }
 
     private void fallBack(SlingHttpServletRequest slingRequest, SlingHttpServletResponse slingResponse) {
         try {
+
             String resourceObject = slingRequest.getParameter(RssFeedConstants.RESOURCE_OBJECT);
             String[] fallBackValues = feedService.multiFieldValues(slingRequest.getResourceResolver(), resourceObject);
-            String jsonString = feedService.createJsonObject(fallBackValues).toString();
-            slingResponse.getWriter().write(jsonString);
+            JsonObject jsonString = feedService.createJsonObject(fallBackValues);
+            slingResponse.setContentType("application/json");
+            slingResponse.setCharacterEncoding("utf-8");
+            slingResponse.setStatus(HttpStatus.SC_OK);
+            slingResponse.getWriter().write(jsonString.toString());
         } catch (IOException e) {
             LOG.error("Writing of json to slingResponse fails : {]", e);
         }
