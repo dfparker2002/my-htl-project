@@ -5,6 +5,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonSyntaxException;
 import com.htl.subrato.core.servlets.RssFeedConstants;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Service;
 import org.apache.http.HttpResponse;
@@ -82,7 +83,7 @@ public class FeedServiceImpl implements FeedService {
 
     @Override
     public String getResponse(String url) {
-        String responseString = null;
+        String responseString = StringUtils.EMPTY;
         try {
             int responseCode;
             DefaultHttpClient httpClient = new DefaultHttpClient();
@@ -101,7 +102,7 @@ public class FeedServiceImpl implements FeedService {
                 responseString = responseString + output;
             }
             httpClient.getConnectionManager().shutdown();
-            return responseString.toString();
+            return responseString;
         } catch (ClientProtocolException e) {
             LOG.error("Error in connection : {}", e);
         } catch (IOException e) {

@@ -2,6 +2,7 @@ package com.htl.subrato.core.servlets;
 
 import com.google.gson.JsonObject;
 import com.htl.subrato.core.services.FeedService;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.sling.SlingServlet;
 import org.apache.http.HttpStatus;
@@ -26,22 +27,24 @@ public class FeedServlet extends SlingSafeMethodsServlet {
                          final SlingHttpServletResponse slingResponse) throws ServletException, IOException {
         LOG.debug("Inside do method of Feed servlet");
         String feedURL = slingRequest.getParameter(RssFeedConstants.FEED_URL);
-        String responseOutput = new String();
+        String responseOutput = StringUtils.EMPTY;
 
         try {
             String jsonString;
             responseOutput = feedService.getResponse(feedURL);
-            LOG.debug(" Feed response XML version: {}", responseOutput);
-            jsonString = feedService.getJSON(responseOutput);
-            slingResponse.setContentType("application/json");
-            slingResponse.setCharacterEncoding("utf-8");
-            slingResponse.setStatus(HttpStatus.SC_OK);
-            slingResponse.getWriter().write(jsonString);
-            LOG.debug("xml to json : " + jsonString);
+            if (StringUtils.EMPTY != responseOutput) {
+                LOG.debug(" Feed response XML version: {}", responseOutput);
+                jsonString = feedService.getJSON(responseOutput);
+                slingResponse.setContentType("application/json");
+                slingResponse.setCharacterEncoding("utf-8");
+                slingResponse.setStatus(HttpStatus.SC_OK);
+                slingResponse.getWriter().write(jsonString);
+                LOG.debug("xml to json : " + jsonString);
+            }
         } catch (Exception e) {
             LOG.error("error in feed : " + e);
         } finally {
-            if (null == responseOutput) {
+            if (StringUtils.EMPTY == responseOutput) {
 
                 fallBack(slingRequest, slingResponse);
             }
