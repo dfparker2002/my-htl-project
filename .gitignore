@@ -194,6 +194,6 @@ fabric.properties
 hs_err_pid*
 
 .idea/
-core/src/main/java/com/htl/subrato/core/package-info.java
-/my-htl-project.iml
-/core/my-htl-project.core.iml
+*.package-info.java
+*.iml
+
