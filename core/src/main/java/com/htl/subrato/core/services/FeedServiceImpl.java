@@ -10,9 +10,11 @@ import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Service;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
+import org.apache.http.ParseException;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.util.EntityUtils;
 import org.apache.sling.api.resource.Resource;
 import org.apache.sling.api.resource.ResourceResolver;
 import org.apache.sling.api.resource.ValueMap;
@@ -22,9 +24,7 @@ import org.json.XML;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.Arrays;
 
 
@@ -48,7 +48,7 @@ public class FeedServiceImpl implements FeedService {
     }
 
     @Override
-    public String  multiFieldValues(ResourceResolver resourceResolver, String resourcePath) {
+    public String multiFieldValues(ResourceResolver resourceResolver, String resourcePath) {
         Resource resource = resourceResolver.getResource(resourcePath);
         String multiFieldToString = StringUtils.EMPTY;
         if (null != resource) {
@@ -80,31 +80,28 @@ public class FeedServiceImpl implements FeedService {
 
     @Override
     public String getResponse(String url) {
-        StringBuilder responseString = new StringBuilder();
+
+        String responseString = StringUtils.EMPTY;
         try {
             int responseCode;
             DefaultHttpClient httpClient = new DefaultHttpClient();
             HttpGet getRequest = new HttpGet(url.trim());
-            getRequest.addHeader("accept", "application/xml");
             HttpResponse response = httpClient.execute(getRequest);
             LOG.debug(" Response from http call : {}", response);
             responseCode = response.getStatusLine().getStatusCode();
             if (responseCode == HttpStatus.SC_OK) {
-                BufferedReader br = new BufferedReader(new InputStreamReader((response.getEntity().getContent())));
-                String output;
-                while ((output = br.readLine()) != null) {
-                    responseString = responseString.append(output);
-                }
-                httpClient.getConnectionManager().shutdown();
-                return responseString.toString();
+                responseString = EntityUtils.toString(response.getEntity());
             } else {
                 LOG.error(" Http Status code :" + responseCode);
             }
+            httpClient.getConnectionManager().shutdown();
         } catch (ClientProtocolException e) {
             LOG.error("Error in connection : {}", e);
         } catch (IOException e) {
             LOG.error("Input Out put operation failed : {}", e);
+        } catch (ParseException e) {
+            LOG.error("Error in parsing response : {}", e);
         }
-        return responseString.toString();
+        return responseString;
     }
 }

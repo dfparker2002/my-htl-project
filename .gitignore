@@ -196,3 +196,5 @@ hs_err_pid*
 *.package-info.java
 *.iml
 
+/core/src/main/java/com/htl/subrato/core/package-info.java
+!/core/src/main/java/com/htl/subrato/core/package-info.java
