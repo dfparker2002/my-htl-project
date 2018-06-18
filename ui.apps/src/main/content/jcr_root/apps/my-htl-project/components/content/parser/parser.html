@@ -1,0 +1,25 @@
+<div data-sly-test="${wcmmode.edit && !properties.address}">
+    Please specify the url
+</div>
+
+Results:
+<div data-sly-test="${properties.link=='true'}" data-sly-use.v="com.htl.subrato.core.components.Parser">
+    <b>Here are the Links</b>
+    <ul data-sly-list="${v.links}">
+        <li>${item}</li>
+    </ul>
+</div>
+
+<div data-sly-test="${properties.imp=='true'}" data-sly-use.imp="com.htl.subrato.core.components.Parser">
+    <b>Here are the Imports</b>
+    <ul data-sly-list="${imp.imports}">
+        <li>${item}</li>
+    </ul>
+</div>
+
+<div data-sly-test="${properties.img=='true'}" data-sly-use.img="com.htl.subrato.core.components.Parser">
+    <b>Here are the Images</b>
+    <ul data-sly-list="${img.images}">
+        <li><img src="${item}"></li>
+    </ul>
+</div>
